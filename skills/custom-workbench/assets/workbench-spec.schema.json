@@ -1,0 +1,181 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://example.invalid/custom-workbench/workbench-spec.schema.json",
+  "title": "Custom Workbench Specification",
+  "type": "object",
+  "required": [
+    "schemaVersion",
+    "identity",
+    "organization",
+    "navigation",
+    "views",
+    "fields",
+    "dataSources",
+    "actions",
+    "privacy",
+    "visualDirection",
+    "acceptance"
+  ],
+  "properties": {
+    "schemaVersion": { "const": "1.0" },
+    "identity": {
+      "type": "object",
+      "required": ["name", "primaryUser", "roleContext", "objective", "decisionsSupported", "outOfScope"],
+      "properties": {
+        "name": { "type": "string", "minLength": 1 },
+        "primaryUser": { "type": "string", "minLength": 1 },
+        "roleContext": { "type": "string", "minLength": 1 },
+        "objective": { "type": "string", "minLength": 1 },
+        "decisionsSupported": { "type": "array", "minItems": 1, "items": { "type": "string", "minLength": 1 } },
+        "outOfScope": { "type": "array", "items": { "type": "string" } }
+      },
+      "additionalProperties": true
+    },
+    "organization": {
+      "type": "object",
+      "required": ["primaryUnit", "entityLabel", "hierarchy"],
+      "properties": {
+        "primaryUnit": { "enum": ["person", "project", "case", "asset", "time-cycle", "hybrid"] },
+        "entityLabel": { "type": "string", "minLength": 1 },
+        "hierarchy": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "object",
+            "required": ["level", "label"],
+            "properties": {
+              "level": { "type": "string", "minLength": 1 },
+              "label": { "type": "string", "minLength": 1 },
+              "identityKey": { "type": "string" }
+            },
+            "additionalProperties": true
+          }
+        }
+      },
+      "additionalProperties": true
+    },
+    "navigation": {
+      "type": "array",
+      "minItems": 1,
+      "items": { "$ref": "#/$defs/idLabelObject" }
+    },
+    "workflows": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/idLabelObject" }
+    },
+    "views": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "required": ["id", "label", "kind", "questionAnswered", "fieldIds", "sourceIds"],
+        "properties": {
+          "id": { "type": "string", "minLength": 1 },
+          "label": { "type": "string", "minLength": 1 },
+          "kind": { "enum": ["queue", "profile", "table", "kanban", "timeline", "metrics", "calendar", "review"] },
+          "questionAnswered": { "type": "string", "minLength": 1 },
+          "fieldIds": { "type": "array", "items": { "type": "string" } },
+          "sourceIds": { "type": "array", "minItems": 1, "items": { "type": "string" } }
+        },
+        "additionalProperties": true
+      }
+    },
+    "fields": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "required": ["id", "label", "type", "sensitivity", "sourceId", "required"],
+        "properties": {
+          "id": { "type": "string", "minLength": 1 },
+          "label": { "type": "string", "minLength": 1 },
+          "type": { "type": "string", "minLength": 1 },
+          "sensitivity": { "enum": ["public", "internal", "personal", "sensitive"] },
+          "sourceId": { "type": "string", "minLength": 1 },
+          "required": { "type": "boolean" }
+        },
+        "additionalProperties": true
+      }
+    },
+    "dataSources": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "required": ["id", "label", "kind", "authority", "location", "refresh", "writeMode"],
+        "properties": {
+          "id": { "type": "string", "minLength": 1 },
+          "label": { "type": "string", "minLength": 1 },
+          "kind": { "enum": ["file", "api", "database", "manual", "derived"] },
+          "authority": { "enum": ["source-of-truth", "snapshot", "derived"] },
+          "location": { "type": "string", "minLength": 1 },
+          "refresh": { "enum": ["manual", "on-open", "event", "scheduled"] },
+          "writeMode": { "enum": ["read-only", "confirmed-write", "automatic"] }
+        },
+        "additionalProperties": true
+      }
+    },
+    "actions": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["id", "label", "kind", "target", "confirmation"],
+        "properties": {
+          "id": { "type": "string", "minLength": 1 },
+          "label": { "type": "string", "minLength": 1 },
+          "kind": { "enum": ["open-file", "open-url", "search", "update-source", "run-command"] },
+          "target": { "type": "string", "minLength": 1 },
+          "confirmation": { "enum": ["never", "when-writing", "always"] }
+        },
+        "additionalProperties": true
+      }
+    },
+    "privacy": {
+      "type": "object",
+      "required": ["containsSensitiveData", "storageBoundary", "redactionRules"],
+      "properties": {
+        "containsSensitiveData": { "type": "boolean" },
+        "storageBoundary": { "type": "string", "minLength": 1 },
+        "redactionRules": { "type": "array", "items": { "type": "string" } },
+        "writeAuthorization": { "type": "string" }
+      },
+      "additionalProperties": true
+    },
+    "visualDirection": {
+      "type": "object",
+      "required": ["density", "tone", "primaryDevice"],
+      "properties": {
+        "density": { "enum": ["compact", "balanced", "spacious"] },
+        "tone": { "type": "string", "minLength": 1 },
+        "primaryDevice": { "enum": ["desktop", "mobile", "both"] }
+      },
+      "additionalProperties": true
+    },
+    "acceptance": {
+      "type": "array",
+      "minItems": 2,
+      "items": {
+        "type": "object",
+        "required": ["id", "scenario", "expected"],
+        "properties": {
+          "id": { "type": "string", "minLength": 1 },
+          "scenario": { "type": "string", "minLength": 1 },
+          "expected": { "type": "string", "minLength": 1 }
+        },
+        "additionalProperties": true
+      }
+    }
+  },
+  "additionalProperties": true,
+  "$defs": {
+    "idLabelObject": {
+      "type": "object",
+      "required": ["id", "label"],
+      "properties": {
+        "id": { "type": "string", "minLength": 1 },
+        "label": { "type": "string", "minLength": 1 }
+      },
+      "additionalProperties": true
+    }
+  }
+}

@@ -1,0 +1,6 @@
+interface:
+  display_name: "custom-workbench"
+  short_description: "通过渐进式访谈为不同职业设计、构建并验收真正可用的定制工作台"
+  default_prompt: "使用 $custom-workbench 先了解我的工作方式，再为我设计并构建一个真正可用的定制工作台。"
+policy:
+  allow_implicit_invocation: true

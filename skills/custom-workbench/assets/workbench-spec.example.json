@@ -1,0 +1,195 @@
+{
+  "schemaVersion": "1.0",
+  "identity": {
+    "name": "保险顾问客户工作台",
+    "primaryUser": "保险顾问",
+    "roleContext": "维护客户需求、沟通记录和下一行动",
+    "objective": "在一分钟内找到最需跟进的客户，并看清依据和下一行动",
+    "decisionsSupported": [
+      "今天优先联系哪位客户",
+      "下一次沟通要补齐什么信息"
+    ],
+    "outOfScope": [
+      "自动替代顾问做承保判断",
+      "未经确认向客户发送消息"
+    ]
+  },
+  "organization": {
+    "primaryUnit": "person",
+    "entityLabel": "客户",
+    "hierarchy": [
+      {
+        "level": "customer",
+        "label": "客户",
+        "identityKey": "customerId"
+      },
+      {
+        "level": "interaction",
+        "label": "沟通记录",
+        "identityKey": "interactionId"
+      }
+    ]
+  },
+  "navigation": [
+    {
+      "id": "needs-attention",
+      "label": "待处理",
+      "type": "saved-view"
+    },
+    {
+      "id": "customers",
+      "label": "客户",
+      "type": "entity-list"
+    }
+  ],
+  "workflows": [
+    {
+      "id": "customer-progress",
+      "label": "客户推进",
+      "stages": ["初次了解", "需求确认", "方案沟通", "待决定", "已完成"]
+    }
+  ],
+  "views": [
+    {
+      "id": "attention-queue",
+      "label": "待处理队列",
+      "kind": "queue",
+      "questionAnswered": "今天最该处理哪位客户，原因是什么？",
+      "fieldIds": ["customer-name", "current-stage", "next-action"],
+      "sourceIds": ["customer-records"]
+    },
+    {
+      "id": "customer-profile",
+      "label": "客户详情",
+      "kind": "profile",
+      "questionAnswered": "这位客户的当前目标、依据和下一行动是什么？",
+      "fieldIds": ["customer-name", "current-stage", "next-action", "health-notes"],
+      "sourceIds": ["customer-records"]
+    },
+    {
+      "id": "interaction-timeline",
+      "label": "沟通时间线",
+      "kind": "timeline",
+      "questionAnswered": "历次沟通发生了什么，承诺和变化在哪里？",
+      "fieldIds": ["interaction-time", "interaction-summary"],
+      "sourceIds": ["interaction-records"]
+    }
+  ],
+  "fields": [
+    {
+      "id": "customer-name",
+      "label": "客户代号",
+      "type": "string",
+      "sensitivity": "personal",
+      "sourceId": "customer-records",
+      "required": true
+    },
+    {
+      "id": "current-stage",
+      "label": "当前阶段",
+      "type": "enum",
+      "sensitivity": "internal",
+      "sourceId": "customer-records",
+      "required": true
+    },
+    {
+      "id": "next-action",
+      "label": "下一行动",
+      "type": "string",
+      "sensitivity": "internal",
+      "sourceId": "customer-records",
+      "required": false
+    },
+    {
+      "id": "health-notes",
+      "label": "核保相关健康摘要",
+      "type": "text",
+      "sensitivity": "sensitive",
+      "sourceId": "customer-records",
+      "required": false
+    },
+    {
+      "id": "interaction-time",
+      "label": "沟通时间",
+      "type": "datetime",
+      "sensitivity": "internal",
+      "sourceId": "interaction-records",
+      "required": true
+    },
+    {
+      "id": "interaction-summary",
+      "label": "沟通摘要",
+      "type": "text",
+      "sensitivity": "sensitive",
+      "sourceId": "interaction-records",
+      "required": true
+    }
+  ],
+  "dataSources": [
+    {
+      "id": "customer-records",
+      "label": "客户档案",
+      "kind": "file",
+      "authority": "source-of-truth",
+      "location": "data/customers.json",
+      "refresh": "on-open",
+      "writeMode": "confirmed-write"
+    },
+    {
+      "id": "interaction-records",
+      "label": "沟通记录",
+      "kind": "file",
+      "authority": "source-of-truth",
+      "location": "data/interactions/",
+      "refresh": "on-open",
+      "writeMode": "read-only"
+    }
+  ],
+  "actions": [
+    {
+      "id": "open-interaction",
+      "label": "打开沟通原文",
+      "kind": "open-file",
+      "target": "interaction-records",
+      "confirmation": "never"
+    },
+    {
+      "id": "update-next-action",
+      "label": "更新下一行动",
+      "kind": "update-source",
+      "target": "customer-records",
+      "confirmation": "when-writing"
+    }
+  ],
+  "privacy": {
+    "containsSensitiveData": true,
+    "storageBoundary": "仅保存在使用者明确指定的本地受控目录",
+    "redactionRules": [
+      "截图和测试数据使用客户代号",
+      "总览不显示健康详情和联系方式"
+    ],
+    "writeAuthorization": "每次写回客户档案前由使用者确认"
+  },
+  "visualDirection": {
+    "density": "compact",
+    "tone": "克制、可信、便于快速扫描",
+    "primaryDevice": "desktop"
+  },
+  "acceptance": [
+    {
+      "id": "find-priority-customer",
+      "scenario": "打开工作台并查看待处理队列",
+      "expected": "一分钟内找到优先客户、原因和下一行动；缺失行动明确标记待补充"
+    },
+    {
+      "id": "trace-interactions",
+      "scenario": "进入客户详情并展开沟通时间线",
+      "expected": "沟通按时间排序且每条可追溯到原始记录，不把同名客户自动合并"
+    },
+    {
+      "id": "protect-sensitive-data",
+      "scenario": "查看总览并生成测试截图",
+      "expected": "总览和测试截图不暴露健康详情或真实客户身份"
+    }
+  ]
+}
