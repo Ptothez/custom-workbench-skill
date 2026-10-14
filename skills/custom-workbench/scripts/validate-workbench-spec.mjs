@@ -98,7 +98,8 @@ if (!requireObject(spec, "spec")) {
   process.exit(1);
 }
 
-if (spec.schemaVersion !== "1.0") fail('schemaVersion must equal "1.0"');
+if (!["1.0", "1.1"].includes(spec.schemaVersion)) fail('schemaVersion must equal "1.0" or "1.1"');
+if(spec.schemaVersion === '1.1' && !['operations','decision','hybrid'].includes(spec.workbenchType)) fail('workbenchType must be operations, decision or hybrid');
 
 if (requireObject(spec.identity, "identity")) {
   requireString(spec.identity.name, "identity.name");
@@ -138,6 +139,20 @@ void workflowIds;
 void viewIds;
 void actionIds;
 void acceptanceIds;
+
+if (['decision','hybrid'].includes(spec.workbenchType) || spec.decisionSupport !== undefined) {
+  if(requireObject(spec.decisionSupport,'decisionSupport')) {
+    const d=spec.decisionSupport;
+    for(const key of ['goalSourceIds','candidateSourceIds','rankingOrder','refreshTriggers','invalidationInputs']) {
+      if(requireArray(d[key],`decisionSupport.${key}`,1)) d[key].forEach((v,i)=>requireString(v,`decisionSupport.${key}[${i}]`));
+    }
+    for(const key of ['goalSourceIds','candidateSourceIds']) for(const id of (Array.isArray(d[key])?d[key]:[])) if(!sourceIds.has(id)) fail(`decisionSupport.${key} references unknown source: ${id}`);
+    for(const key of ['planStore','failurePolicy','executionBoundary'])requireString(d[key],`decisionSupport.${key}`);
+    if(!['rule','model','human'].includes(d.selectionMode))fail('decisionSupport.selectionMode is invalid');
+    if(!['rule','human','unavailable'].includes(d.fallbackMode))fail('decisionSupport.fallbackMode is invalid');
+    if(!['human-confirmed','proposal-only'].includes(d.confirmationMode))fail('decisionSupport.confirmationMode must not imply automatic human approval');
+  }
+}
 
 const viewKinds = new Set(["queue", "profile", "table", "kanban", "timeline", "metrics", "calendar", "review"]);
 for (const [index, view] of (spec.views ?? []).entries()) {

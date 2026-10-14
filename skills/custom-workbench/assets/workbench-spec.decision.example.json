@@ -1,0 +1,49 @@
+{
+  "schemaVersion": "1.1",
+  "workbenchType": "decision",
+  "identity": {
+    "name": "项目行动提案台",
+    "primaryUser": "项目负责人",
+    "roleContext": "从已登记目标和行动中判断下一步",
+    "objective": "无需重复填表即可查看有出处的提案并确认安排",
+    "decisionsSupported": ["当前目标下先推进哪件事"],
+    "outOfScope": ["替本人批准计划", "未经授权对外执行"]
+  },
+  "organization": {
+    "primaryUnit": "project",
+    "entityLabel": "项目",
+    "hierarchy": [{"level": "project", "label": "项目", "identityKey": "projectId"}, {"level": "action", "label": "行动", "identityKey": "actionId"}]
+  },
+  "navigation": [{"id": "today", "label": "今日提案", "type": "saved-view"}, {"id": "all", "label": "全部行动", "type": "entity-list"}],
+  "views": [{"id": "proposal", "label": "今日提案", "kind": "queue", "questionAnswered": "为什么现在做这件事，在哪里继续？", "fieldIds": ["title", "reason"], "sourceIds": ["actions", "goals"]}],
+  "fields": [
+    {"id": "title", "label": "行动", "type": "string", "sensitivity": "internal", "sourceId": "actions", "required": true},
+    {"id": "reason", "label": "选择依据", "type": "string", "sensitivity": "internal", "sourceId": "goals", "required": true}
+  ],
+  "dataSources": [
+    {"id": "goals", "label": "已确认目标", "kind": "file", "authority": "source-of-truth", "location": "data/goals.json", "refresh": "on-open", "writeMode": "read-only"},
+    {"id": "actions", "label": "登记行动", "kind": "file", "authority": "source-of-truth", "location": "data/actions.json", "refresh": "on-open", "writeMode": "read-only"},
+    {"id": "plans", "label": "本人确认计划", "kind": "file", "authority": "source-of-truth", "location": "data/decisions/plans.json", "refresh": "on-open", "writeMode": "confirmed-write"}
+  ],
+  "decisionSupport": {
+    "goalSourceIds": ["goals"],
+    "candidateSourceIds": ["actions"],
+    "rankingOrder": ["已确认目标贡献", "同等贡献时考虑期限"],
+    "selectionMode": "model",
+    "fallbackMode": "rule",
+    "confirmationMode": "human-confirmed",
+    "planStore": "data/decisions/plans.json",
+    "refreshTriggers": ["打开", "跨日", "已处理来源变化", "手动重算"],
+    "invalidationInputs": ["业务日期", "目标版本", "排序版本", "来源处理版本", "确认与反馈版本"],
+    "failurePolicy": "互斥、超时、有限重试与冷却；降级显示规则提案，已确认计划保留",
+    "executionBoundary": "只提出安排；本人确认后保存，确认不授权对外操作"
+  },
+  "actions": [{"id": "confirm", "label": "确认安排", "kind": "update-source", "target": "plans", "confirmation": "when-writing"}],
+  "privacy": {"containsSensitiveData": false, "storageBoundary": "用户指定的受控项目目录", "redactionRules": ["模型只接必要摘要"], "writeAuthorization": "本人确认才保存计划"},
+  "visualDirection": {"density": "compact", "tone": "简洁、依据可展开、后台工具另列", "primaryDevice": "both"},
+  "acceptance": [
+    {"id": "priority", "scenario": "期限更早但目标贡献更低的行动进入候选", "expected": "按已确认排序选择，行动和依据可追溯，不以期限直接夺位"},
+    {"id": "refresh", "scenario": "确认计划后来源变化或模型超时", "expected": "计划不被覆盖；调整建议和规则降级如实标识，不伪造新模型判断"},
+    {"id": "navigate", "scenario": "点击行动执行入口再返回", "expected": "打开正确对象并可回到提案；未授权不对外执行"}
+  ]
+}

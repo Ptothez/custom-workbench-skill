@@ -1,5 +1,6 @@
 {
-  "schemaVersion": "1.0",
+  "schemaVersion": "1.1",
+  "workbenchType": "operations",
   "identity": {
     "name": "保险顾问客户工作台",
     "primaryUser": "保险顾问",
