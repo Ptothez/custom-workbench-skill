@@ -2,6 +2,7 @@
 
 import fs from "node:fs";
 import path from "node:path";
+import {validateNavigation} from './validate-navigation-contract.mjs';
 
 const args = process.argv.slice(2);
 const portable = args.includes("--portable");
@@ -255,6 +256,8 @@ walkStrings(spec, (value, trail) => {
 if (spec.privacy?.containsSensitiveData && !hasSensitiveField) {
   warn("privacy declares sensitive data but no field is marked sensitive");
 }
+
+if(spec.interactionMap)for(const message of validateNavigation(spec))fail(message);
 
 if (errors.length > 0) {
   console.error(`INVALID ${resolvedPath}`);

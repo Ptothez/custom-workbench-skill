@@ -1,6 +1,6 @@
 # custom-workbench
 
-设计或改造连接真实记录、判断与执行机制的工作台。版本 1.1.1 区分决策推进台和管理操作台：前者帮助使用者决定先做什么，后者围绕客户、案件、资产等对象推进工作。不把所有场景套成每日三件事；仅打开已有工作台时不使用。
+设计或改造连接真实记录、判断与执行机制的工作台。版本 1.2.0 保留决策推进台和管理操作台的区分，补齐多层导航、进入与返回、深链接和今日行动可用性的验收方法。不把所有场景套成每日三件事；仅打开已有工作台时不使用。
 
 ## 主要能力与边界
 
@@ -11,6 +11,12 @@
 - 按真实业务案例、交互和视觉分别验收，不以页面能打开代替业务有效。
 
 ## 安装
+
+### 1.2.0 更新
+
+- 先盘点真实页面和父子归属，区分「返回上一级」与浏览器后退；内嵌页面与旧书签保留一致的工作区上下文。
+- 今日首屏展示具体行动与第一步，展开后提供做法、完成标准和准确入口，不改变任务身份或授权。
+- 新增导航关系校验，拒绝重复路径、孤儿父项及循环；实际点击与截图仍需独立验收。
 
 ```bash
 npx -y skills add Ptothez/custom-workbench-skill -g --all
@@ -34,6 +40,7 @@ npx -y skills add Ptothez/custom-workbench-skill -g --all
 ```bash
 node skills/custom-workbench/scripts/test-validate-workbench-spec.mjs
 node skills/custom-workbench/scripts/test-decision-contract.mjs
+node skills/custom-workbench/scripts/test-navigation-contract.mjs
 ```
 
 这些命令验证契约与拒绝错误输入，不证明目标工作台已实现或实际业务重点始终正确。
