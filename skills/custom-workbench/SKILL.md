@@ -7,6 +7,8 @@ metadata:
 
 # 定制工作台
 
+English: Build or improve a workbench showing project progress, next actions, and business data. Connect existing records and verify the implementation against real tasks.
+
 把使用者真正要做的判断和推进的工作，转化为一个可运行、可追溯、可继续修改的定制工作台。不要套用统一模板，也不要把「展示更多数据」误当成完成。
 
 ## 交付结果
