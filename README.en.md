@@ -6,6 +6,9 @@ Have several projects and conversations, and want to see where things stand and 
 
 It starts with your existing projects and records, then designs pages, connects data, and checks the result against real tasks. It can also improve an existing workbench: navigation, tasks, or access to business administration pages. It is not a ready-made desktop application. Your AI must implement it in your environment.
 
+
+When feedback should guide future work, preserve the original comments, record what was done, and validate reusable rules before activating them. Do not copy the author's projects, personal layout, or preferences.
+
 ## Install
 
 ```bash
@@ -30,7 +33,7 @@ Updates must be implemented for your environment. Installing the skill does not 
 
 ## Development Checks
 
-Requires a Skills-capable AI client. Examples and validation scripts use Node.js; the application can use your existing technology stack. Current version: 1.2.0.
+Requires a Skills-capable AI client. Examples and validation scripts use Node.js; the application can use your existing technology stack. Current version: 1.3.0.
 
 ```bash
 node skills/custom-workbench/scripts/test-validate-workbench-spec.mjs

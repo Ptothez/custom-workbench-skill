@@ -6,6 +6,9 @@
 
 它会先了解你已有的项目和记录，再设计页面、连接数据并检查实际使用效果。也可以改造现有工作台，例如调整导航、显示待办、连接业务后台。它不是装上就能用的成品软件，需要由 AI 在你的环境里完成实现。
 
+
+用户反馈需要后续复用时，会保留原话、记录落实结果，再把可跨场景使用的经验提炼为待确认规则。不会照搬作者的项目、私人布局或偏好。
+
 ## 安装
 
 ```bash
@@ -30,7 +33,7 @@ npx -y skills add Ptothez/custom-workbench-skill -g --all
 
 ## 开发检查
 
-需要支持 Skills 的 AI 客户端。示例与检查脚本使用 Node.js，实际应用可沿用已有技术栈。当前版本 1.2.0。
+需要支持 Skills 的 AI 客户端。示例与检查脚本使用 Node.js，实际应用可沿用已有技术栈。当前版本 1.3.0。
 
 ```bash
 node skills/custom-workbench/scripts/test-validate-workbench-spec.mjs
